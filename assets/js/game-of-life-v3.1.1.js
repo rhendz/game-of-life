@@ -6,6 +6,9 @@
  * 04/Sep/2010
  */
 
+// Configuration is no longer loaded from URLs.
+// Rather, loadConfig and loadState have been modified.
+
 (function () {
 
   var stats = new Stats();
@@ -58,7 +61,7 @@
     },
 
     // Initial state
-    initialState : '[{"39":[110]},{"40":[112]},{"41":[109,110,113,114,115]}]',
+    // initialState : '[{"39":[110]},{"40":[112]},{"41":[109,110,113,114,115]}]',
 
     // Trail state
     trail : {
@@ -166,29 +169,27 @@
     },
 
 
-    /**
-         * Load config from URL
-         */
+    // Manually load configuration
     loadConfig : function() {
       var colors, grid, zoom;
 
-      this.autoplay = this.helpers.getUrlParameter('autoplay') === '1' ? true : this.autoplay;
-      this.trail.current = this.helpers.getUrlParameter('trail') === '1' ? true : this.trail.current;
+      this.autoplay = 0;
+      this.trail.current = 0;
 
       // Initial color config
-      colors = parseInt(this.helpers.getUrlParameter('colors'), 10);
+      colors = parseInt(1);
       if (isNaN(colors) || colors < 1 || colors > GOL.colors.schemes.length) {
         colors = 1;
       }
 
       // Initial grid config
-      grid = parseInt(this.helpers.getUrlParameter('grid'), 10);
+      grid = parseInt(4);
       if (isNaN(grid) || grid < 1 || grid > GOL.grid.schemes.length) {
         grid = 1;
       }
 
       // Initial zoom config
-      zoom = parseInt(this.helpers.getUrlParameter('zoom'), 10);
+      zoom = parseInt(1);
       if (isNaN(zoom) || zoom < 1 || zoom > GOL.zoom.schemes.length) {
         zoom = 1;
       }
@@ -202,29 +203,29 @@
     },
 
 
-    /**
-         * Load world state from URL parameter
-         */
+    // Manually load state - by default random
     loadState : function() {
-      var state, i, j, y, s = this.helpers.getUrlParameter('s');
+      // var state, i, j, y, s = this.helpers.getUrlParameter('s');
 
-      if ( s === 'random') {
-        this.randomState();
-      } else {
-        if (s == undefined) {
-          s = this.initialState;
-        }
+      this.randomState();
 
-        state = jsonParse(decodeURI(s));
-
-        for (i = 0; i < state.length; i++) {
-          for (y in state[i]) {
-            for (j = 0 ; j < state[i][y].length ; j++) {
-              this.listLife.addCell(state[i][y][j], parseInt(y, 10), this.listLife.actualState);
-            }
-          }
-        }
-      }
+      // if ( s === 'random') {
+      //   this.randomState();
+      // } else {
+      //   if (s == undefined) {
+      //     s = this.initialState;
+      //   }
+      //
+      //   state = jsonParse(decodeURI(s));
+      //
+      //   for (i = 0; i < state.length; i++) {
+      //     for (y in state[i]) {
+      //       for (j = 0 ; j < state[i][y].length ; j++) {
+      //         this.listLife.addCell(state[i][y][j], parseInt(y, 10), this.listLife.actualState);
+      //       }
+      //     }
+      //   }
+      // }
     },
 
 
@@ -595,6 +596,9 @@
 
         this.canvas = document.getElementById('canvas');
         this.context = this.canvas.getContext('2d');
+
+        // Create a custom zoom that resizes based on canvas
+        GOL.zoom.schemes
 
         this.cellSize = GOL.zoom.schemes[GOL.zoom.current].cellSize;
         this.cellSpace = 1;
