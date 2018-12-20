@@ -18,7 +18,7 @@
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.right = '0px';
   stats.domElement.style.bottom = '0px';
-  stats.domElement.style.zIndex = '-999999';
+  stats.domElement.style.zIndex = '1'; // Stacked on top for debugging
 
   document.addEventListener("DOMContentLoaded", function() {
     document.body.appendChild( stats.domElement );
@@ -104,7 +104,7 @@
       {
         columns : 180,
         rows : 86,
-        cellSize : 4
+        cellSize : 8
       },
 
       {
@@ -595,10 +595,11 @@
       init : function() {
 
         this.canvas = document.getElementById('canvas');
+
         this.context = this.canvas.getContext('2d');
 
         // Create a custom zoom that resizes based on canvas
-        GOL.zoom.schemes
+        console.log("width: " + this.canvas.scrollWidth + " height: " + this.canvas.scrollHeight);
 
         this.cellSize = GOL.zoom.schemes[GOL.zoom.current].cellSize;
         this.cellSpace = 1;
@@ -645,10 +646,10 @@
 
         // Dynamic canvas size
         this.width = this.width + (this.cellSpace * GOL.columns) + (this.cellSize * GOL.columns);
-        this.canvas.setAttribute('width', this.width);
+        this.canvas.setAttribute('width', this.canvas.scrollWidth);
 
         this.height = this.height + (this.cellSpace * GOL.rows) + (this.cellSize * GOL.rows);
-        this.canvas.setAttribute('height', this.height);
+        this.canvas.setAttribute('height', this.canvas.scrollHeight);
 
         // Fill background
         this.context.fillStyle = GOL.grid.schemes[GOL.grid.current].color;
