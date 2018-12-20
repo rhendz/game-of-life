@@ -33,7 +33,7 @@
     generation : 0,
 
     running : false,
-    autoplay : false,
+    autoplay : true,
 
 
     // Clear state
@@ -158,9 +158,9 @@
         this.listLife.init();   // Reset/init algorithm
         this.loadConfig();      // Load config from URL (autoplay, colors, zoom, ...)
         this.loadState();       // Load state from URL
-        this.keepDOMElements(); // Keep DOM References (getElementsById)
+        //this.keepDOMElements(); // Keep DOM References (getElementsById)
         this.canvas.init();     // Init canvas GUI
-        this.registerEvents();  // Register event handlers
+        //this.registerEvents();  // Register event handlers
 
         this.prepare();
       } catch (e) {
@@ -173,7 +173,7 @@
     loadConfig : function() {
       var colors, grid, zoom;
 
-      this.autoplay = 0;
+      this.autoplay = GOL.autoplay;
       this.trail.current = 0;
 
       // Initial color config
@@ -259,9 +259,9 @@
       this.generation = this.times.algorithm = this.times.gui = 0;
       this.mouseDown = this.clear.schedule = false;
 
-      this.element.generation.innerHTML = '0';
-      this.element.livecells.innerHTML = '0';
-      this.element.steptime.innerHTML = '0 / 0 (0 / 0)';
+      // this.element.generation.innerHTML = '0';
+      // this.element.livecells.innerHTML = '0';
+      // this.element.steptime.innerHTML = '0 / 0 (0 / 0)';
 
       this.canvas.clearWorld(); // Reset GUI
       this.canvas.drawWorld(); // Draw State
@@ -364,13 +364,13 @@
 
       // Running Information
       GOL.generation++;
-      GOL.element.generation.innerHTML = GOL.generation;
-      GOL.element.livecells.innerHTML = liveCellNumber;
+      // GOL.element.generation.innerHTML = GOL.generation;
+      // GOL.element.livecells.innerHTML = liveCellNumber;
 
       r = 1.0/GOL.generation;
       GOL.times.algorithm = (GOL.times.algorithm * (1 - r)) + (algorithmTime * r);
       GOL.times.gui = (GOL.times.gui * (1 - r)) + (guiTime * r);
-      GOL.element.steptime.innerHTML = algorithmTime + ' / '+guiTime+' ('+Math.round(GOL.times.algorithm) + ' / '+Math.round(GOL.times.gui)+')';
+      // GOL.element.steptime.innerHTML = algorithmTime + ' / '+guiTime+' ('+Math.round(GOL.times.algorithm) + ' / '+Math.round(GOL.times.gui)+')';
 
       // Flow Control
       if (GOL.running) {
@@ -460,14 +460,14 @@
          * Button Handler - Run
          */
         run : function() {
-          GOL.element.hint.style.display = 'none';
+          // GOL.element.hint.style.display = 'none';
 
           GOL.running = !GOL.running;
           if (GOL.running) {
             GOL.nextStep();
-            document.getElementById('buttonRun').value = 'Stop';
+            // document.getElementById('buttonRun').value = 'Stop';
           } else {
-            document.getElementById('buttonRun').value = 'Run';
+            // document.getElementById('buttonRun').value = 'Run';
           }
         },
 
