@@ -6,6 +6,9 @@
  * 04/Sep/2010
  */
 
+// Configuration is no longer loaded from URLs.
+// Rather, loadConfig and loadState have been modified.
+
 (function () {
 
   var stats = new Stats();
@@ -15,7 +18,7 @@
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.right = '0px';
   stats.domElement.style.bottom = '0px';
-  stats.domElement.style.zIndex = '-999999';
+  stats.domElement.style.zIndex = '1';
 
   document.addEventListener("DOMContentLoaded", function() {
     document.body.appendChild( stats.domElement );
@@ -25,12 +28,13 @@
 
     columns : 0,
     rows : 0,
+    maxCells : 2000, // Max cells shown in canvas
 
     waitTime: 0,
     generation : 0,
 
     running : false,
-    autoplay : false,
+    autoplay : true,
 
 
     // Clear state
@@ -58,7 +62,7 @@
     },
 
     // Initial state
-    initialState : '[{"39":[110]},{"40":[112]},{"41":[109,110,113,114,115]}]',
+    // initialState : '[{"39":[110]},{"40":[112]},{"41":[109,110,113,114,115]}]',
 
     // Trail state
     trail : {
@@ -101,7 +105,7 @@
       {
         columns : 180,
         rows : 86,
-        cellSize : 4
+        cellSize : 8
       },
 
       {
@@ -155,9 +159,9 @@
         this.listLife.init();   // Reset/init algorithm
         this.loadConfig();      // Load config from URL (autoplay, colors, zoom, ...)
         this.loadState();       // Load state from URL
-        this.keepDOMElements(); // Keep DOM References (getElementsById)
+        //this.keepDOMElements(); // Keep DOM References (getElementsById)
         this.canvas.init();     // Init canvas GUI
-        this.registerEvents();  // Register event handlers
+        //this.registerEvents();  // Register event handlers
 
         this.prepare();
       } catch (e) {
@@ -166,29 +170,27 @@
     },
 
 
-    /**
-         * Load config from URL
-         */
+    // Manually load configuration
     loadConfig : function() {
       var colors, grid, zoom;
 
-      this.autoplay = this.helpers.getUrlParameter('autoplay') === '1' ? true : this.autoplay;
-      this.trail.current = this.helpers.getUrlParameter('trail') === '1' ? true : this.trail.current;
+      this.autoplay = GOL.autoplay;
+      this.trail.current = 0;
 
       // Initial color config
-      colors = parseInt(this.helpers.getUrlParameter('colors'), 10);
+      colors = parseInt(1);
       if (isNaN(colors) || colors < 1 || colors > GOL.colors.schemes.length) {
         colors = 1;
       }
 
       // Initial grid config
-      grid = parseInt(this.helpers.getUrlParameter('grid'), 10);
+      grid = parseInt(4);
       if (isNaN(grid) || grid < 1 || grid > GOL.grid.schemes.length) {
         grid = 1;
       }
 
       // Initial zoom config
-      zoom = parseInt(this.helpers.getUrlParameter('zoom'), 10);
+      zoom = parseInt(1);
       if (isNaN(zoom) || zoom < 1 || zoom > GOL.zoom.schemes.length) {
         zoom = 1;
       }
@@ -197,34 +199,53 @@
       this.grid.current = grid - 1;
       this.zoom.current = zoom - 1;
 
+      // Sets a custom zoom based on scrollWidth and scrollHeight
+      var canvas = document.getElementById('canvas');
+      GOL.columns = canvas.scrollWidth;
+      GOL.rows = canvas.scrollHeight;
+      var cellSize = 1; // Smallest possible cell size
+
+      while ((GOL.columns * GOL.rows) / cellSize > GOL.maxCells) {
+        console.log(GOL.columns + " " + GOL.rows + " " + cellSize);
+        GOL.columns /= 2;
+        GOL.rows /= 2;
+        cellSize *= 2;
+      }
+
+      this.zoom.schemes[this.zoom.current].rows = GOL.rows;
+      this.zoom.schemes[this.zoom.current].columns = GOL.columns;
+      this.zoom.schemes[this.zoom.current].cellSize = cellSize;
+
       this.rows = this.zoom.schemes[this.zoom.current].rows;
       this.columns = this.zoom.schemes[this.zoom.current].columns;
+
+      console.log(this.rows + " " + this.columns + " " + cellSize);
     },
 
 
-    /**
-         * Load world state from URL parameter
-         */
+    // Manually load state - by default random
     loadState : function() {
-      var state, i, j, y, s = this.helpers.getUrlParameter('s');
+      // var state, i, j, y, s = this.helpers.getUrlParameter('s');
 
-      if ( s === 'random') {
-        this.randomState();
-      } else {
-        if (s == undefined) {
-          s = this.initialState;
-        }
+      this.randomState();
 
-        state = jsonParse(decodeURI(s));
-
-        for (i = 0; i < state.length; i++) {
-          for (y in state[i]) {
-            for (j = 0 ; j < state[i][y].length ; j++) {
-              this.listLife.addCell(state[i][y][j], parseInt(y, 10), this.listLife.actualState);
-            }
-          }
-        }
-      }
+      // if ( s === 'random') {
+      //   this.randomState();
+      // } else {
+      //   if (s == undefined) {
+      //     s = this.initialState;
+      //   }
+      //
+      //   state = jsonParse(decodeURI(s));
+      //
+      //   for (i = 0; i < state.length; i++) {
+      //     for (y in state[i]) {
+      //       for (j = 0 ; j < state[i][y].length ; j++) {
+      //         this.listLife.addCell(state[i][y][j], parseInt(y, 10), this.listLife.actualState);
+      //       }
+      //     }
+      //   }
+      // }
     },
 
 
@@ -258,9 +279,9 @@
       this.generation = this.times.algorithm = this.times.gui = 0;
       this.mouseDown = this.clear.schedule = false;
 
-      this.element.generation.innerHTML = '0';
-      this.element.livecells.innerHTML = '0';
-      this.element.steptime.innerHTML = '0 / 0 (0 / 0)';
+      // this.element.generation.innerHTML = '0';
+      // this.element.livecells.innerHTML = '0';
+      // this.element.steptime.innerHTML = '0 / 0 (0 / 0)';
 
       this.canvas.clearWorld(); // Reset GUI
       this.canvas.drawWorld(); // Draw State
@@ -363,13 +384,13 @@
 
       // Running Information
       GOL.generation++;
-      GOL.element.generation.innerHTML = GOL.generation;
-      GOL.element.livecells.innerHTML = liveCellNumber;
+      // GOL.element.generation.innerHTML = GOL.generation;
+      // GOL.element.livecells.innerHTML = liveCellNumber;
 
       r = 1.0/GOL.generation;
       GOL.times.algorithm = (GOL.times.algorithm * (1 - r)) + (algorithmTime * r);
       GOL.times.gui = (GOL.times.gui * (1 - r)) + (guiTime * r);
-      GOL.element.steptime.innerHTML = algorithmTime + ' / '+guiTime+' ('+Math.round(GOL.times.algorithm) + ' / '+Math.round(GOL.times.gui)+')';
+      // GOL.element.steptime.innerHTML = algorithmTime + ' / '+guiTime+' ('+Math.round(GOL.times.algorithm) + ' / '+Math.round(GOL.times.gui)+')';
 
       // Flow Control
       if (GOL.running) {
@@ -459,14 +480,14 @@
          * Button Handler - Run
          */
         run : function() {
-          GOL.element.hint.style.display = 'none';
+          // GOL.element.hint.style.display = 'none';
 
           GOL.running = !GOL.running;
           if (GOL.running) {
             GOL.nextStep();
-            document.getElementById('buttonRun').value = 'Stop';
+            // document.getElementById('buttonRun').value = 'Stop';
           } else {
-            document.getElementById('buttonRun').value = 'Run';
+            // document.getElementById('buttonRun').value = 'Run';
           }
         },
 
@@ -594,7 +615,11 @@
       init : function() {
 
         this.canvas = document.getElementById('canvas');
+
         this.context = this.canvas.getContext('2d');
+
+        // Create a custom zoom that resizes based on canvas
+        console.log("width: " + this.canvas.scrollWidth + " height: " + this.canvas.scrollHeight);
 
         this.cellSize = GOL.zoom.schemes[GOL.zoom.current].cellSize;
         this.cellSpace = 1;
@@ -641,10 +666,10 @@
 
         // Dynamic canvas size
         this.width = this.width + (this.cellSpace * GOL.columns) + (this.cellSize * GOL.columns);
-        this.canvas.setAttribute('width', this.width);
+        this.canvas.setAttribute('width', this.canvas.scrollWidth);
 
         this.height = this.height + (this.cellSpace * GOL.rows) + (this.cellSize * GOL.rows);
-        this.canvas.setAttribute('height', this.height);
+        this.canvas.setAttribute('height', this.canvas.scrollHeight);
 
         // Fill background
         this.context.fillStyle = GOL.grid.schemes[GOL.grid.current].color;
@@ -732,6 +757,7 @@
        * changeCelltoAlive
        */
       changeCelltoAlive : function(i, j) {
+        console.log(i + " " + j + " " + GOL.columns + " " + GOL.rows);
         if (i >= 0 && i < GOL.columns && j >=0 && j < GOL.rows) {
           this.age[i][j] = 1;
           this.drawCell(i, j, true);
