@@ -8,24 +8,24 @@
 
 (function () {
 
-  var stats = new Stats();
-  stats.setMode(0); // 0 FPS, 1 MS
+  // var stats = new Stats();
+  // stats.setMode(0); // 0 FPS, 1 MS
+  //
+  // // align top-left
+  // stats.domElement.style.position = 'absolute';
+  // stats.domElement.style.right = '0px';
+  // stats.domElement.style.bottom = '0px';
+  // stats.domElement.style.zIndex = '1';
 
-  // align top-left
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.right = '0px';
-  stats.domElement.style.bottom = '0px';
-  stats.domElement.style.zIndex = '1';
-
-  document.addEventListener("DOMContentLoaded", function() {
-    document.body.appendChild( stats.domElement );
-  });
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   document.body.appendChild( stats.domElement );
+  // });
 
   var GOL = {
 
     columns : 0,
     rows : 0,
-    maxCells : 2500, // Max cells shown in canvas
+    maxCells : 5000, // Max cells shown in canvas
 
     waitTime: 0,
     generation : 0,
@@ -324,9 +324,9 @@
       // Flow Control
       if (GOL.running) {
         function animateFrame() {
-          stats.begin();
+          // stats.begin();
           window.requestAnimationFrame(GOL.nextStep);
-          stats.end();
+          // stats.end();
         }
 
         if (GOL.waitTime > 0) setTimeout(function() { animateFrame() }, GOL.waitTime);
