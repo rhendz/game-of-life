@@ -9,7 +9,7 @@
 (function () {
 
   var stats = new Stats();
-  stats.setMode( 0 ); // 0 FPS, 1 MS
+  stats.setMode(0); // 0 FPS, 1 MS
 
   // align top-left
   stats.domElement.style.position = 'absolute';
@@ -25,7 +25,7 @@
 
     columns : 0,
     rows : 0,
-    maxCells : 2000, // Max cells shown in canvas
+    maxCells : 2500, // Max cells shown in canvas
 
     waitTime: 0,
     generation : 0,
@@ -148,6 +148,10 @@
          */
     init : function() {
       try {
+        window.addEventListener("resize", function() {
+          GOL.cleanUp();
+          GOL.init();
+        });
         this.listLife.init();   // Reset/init algorithm
         this.loadConfig();      // Load config from URL (autoplay, colors, zoom, ...)
         this.loadState();       // Load state from URL
@@ -196,7 +200,6 @@
       var cellSize = 1; // Smallest possible cell size
 
       while ((GOL.columns * GOL.rows) / cellSize > GOL.maxCells) {
-        console.log(GOL.columns + " " + GOL.rows + " " + cellSize);
         GOL.columns /= 2;
         GOL.rows /= 2;
         cellSize *= 2;
@@ -208,8 +211,6 @@
 
       this.rows = this.zoom.schemes[this.zoom.current].rows;
       this.columns = this.zoom.schemes[this.zoom.current].columns;
-
-      console.log(this.rows + " " + this.columns + " " + cellSize);
     },
 
 
@@ -486,9 +487,6 @@
 
         this.context = this.canvas.getContext('2d');
 
-        // Create a custom zoom that resizes based on canvas
-        console.log("width: " + this.canvas.scrollWidth + " height: " + this.canvas.scrollHeight);
-
         this.cellSize = GOL.zoom.schemes[GOL.zoom.current].cellSize;
         this.cellSpace = 1;
 
@@ -625,7 +623,6 @@
        * changeCelltoAlive
        */
       changeCelltoAlive : function(i, j) {
-        console.log(i + " " + j + " " + GOL.columns + " " + GOL.rows);
         if (i >= 0 && i < GOL.columns && j >=0 && j < GOL.rows) {
           this.age[i][j] = 1;
           this.drawCell(i, j, true);
