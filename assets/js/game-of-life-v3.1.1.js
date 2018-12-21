@@ -18,7 +18,7 @@
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.right = '0px';
   stats.domElement.style.bottom = '0px';
-  stats.domElement.style.zIndex = '1'; // Stacked on top for debugging
+  stats.domElement.style.zIndex = '1';
 
   document.addEventListener("DOMContentLoaded", function() {
     document.body.appendChild( stats.domElement );
@@ -28,6 +28,7 @@
 
     columns : 0,
     rows : 0,
+    maxCells : 2000, // Max cells shown in canvas
 
     waitTime: 0,
     generation : 0,
@@ -198,8 +199,27 @@
       this.grid.current = grid - 1;
       this.zoom.current = zoom - 1;
 
+      // Sets a custom zoom based on scrollWidth and scrollHeight
+      var canvas = document.getElementById('canvas');
+      GOL.columns = canvas.scrollWidth;
+      GOL.rows = canvas.scrollHeight;
+      var cellSize = 1; // Smallest possible cell size
+
+      while ((GOL.columns * GOL.rows) / cellSize > GOL.maxCells) {
+        console.log(GOL.columns + " " + GOL.rows + " " + cellSize);
+        GOL.columns /= 2;
+        GOL.rows /= 2;
+        cellSize *= 2;
+      }
+
+      this.zoom.schemes[this.zoom.current].rows = GOL.rows;
+      this.zoom.schemes[this.zoom.current].columns = GOL.columns;
+      this.zoom.schemes[this.zoom.current].cellSize = cellSize;
+
       this.rows = this.zoom.schemes[this.zoom.current].rows;
       this.columns = this.zoom.schemes[this.zoom.current].columns;
+
+      console.log(this.rows + " " + this.columns + " " + cellSize);
     },
 
 
@@ -737,6 +757,7 @@
        * changeCelltoAlive
        */
       changeCelltoAlive : function(i, j) {
+        console.log(i + " " + j + " " + GOL.columns + " " + GOL.rows);
         if (i >= 0 && i < GOL.columns && j >=0 && j < GOL.rows) {
           this.age[i][j] = 1;
           this.drawCell(i, j, true);
