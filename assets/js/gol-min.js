@@ -55,14 +55,6 @@
       hint : null
     },
 
-
-    // Trail state
-    trail : {
-      current: true,
-      schedule : false
-    },
-
-
     // Grid style
     grid : {
       current : 0,
@@ -123,19 +115,16 @@
       schemes : [
       {
         dead : '#FFFFFF',
-        trail : ['#B5ECA2'],
         alive : ['#9898FF', '#8585FF', '#7272FF', '#5F5FFF', '#4C4CFF', '#3939FF', '#2626FF', '#1313FF', '#0000FF', '#1313FF', '#2626FF', '#3939FF', '#4C4CFF', '#5F5FFF', '#7272FF', '#8585FF']
       },
 
       {
         dead : '#FFFFFF',
-        trail : ['#EE82EE', '#FF0000', '#FF7F00', '#FFFF00', '#008000 ', '#0000FF', '#4B0082'],
         alive : ['#FF0000', '#FF7F00', '#FFFF00', '#008000 ', '#0000FF', '#4B0082', '#EE82EE']
       },
 
       {
         dead : '#FFFFFF',
-        trail : ['#9898FF', '#8585FF', '#7272FF', '#5F5FFF', '#4C4CFF', '#3939FF', '#2626FF', '#1313FF', '#0000FF', '#1313FF', '#2626FF', '#3939FF', '#4C4CFF', '#5F5FFF', '#7272FF', '#8585FF'],
         alive : ['#000000']
       }
 
@@ -169,7 +158,6 @@
       var colors, grid, zoom;
 
       this.autoplay = GOL.autoplay;
-      this.trail.current = 0;
 
       // Initial color config
       colors = parseInt(1);
@@ -296,12 +284,6 @@
 
       // Pos-run updates
 
-      // Clear Trail
-      if (GOL.trail.schedule) {
-        GOL.trail.schedule = false;
-        GOL.canvas.drawWorld();
-      }
-
       // Change Grid
       if (GOL.grid.schedule) {
         GOL.grid.schedule = false;
@@ -420,20 +402,6 @@
             GOL.cleanUp();
           }
         },
-
-
-        /**
-         * Button Handler - Remove/Add Trail
-         */
-        trail : function() {
-          GOL.trail.current = !GOL.trail.current;
-          if (GOL.running) {
-            GOL.trail.schedule = true;
-          } else {
-            GOL.canvas.drawWorld();
-          }
-        },
-
 
         /**
          *
@@ -577,17 +545,10 @@
       drawCell : function (i, j, alive) {
 
         if (alive) {
-
           if (this.age[i][j] > -1)
             this.context.fillStyle = GOL.colors.schemes[GOL.colors.current].alive[this.age[i][j] % GOL.colors.schemes[GOL.colors.current].alive.length];
-
-        } else {
-          if (GOL.trail.current && this.age[i][j] < 0) {
-            this.context.fillStyle = GOL.colors.schemes[GOL.colors.current].trail[(this.age[i][j] * -1) % GOL.colors.schemes[GOL.colors.current].trail.length];
-          } else {
+        } else
             this.context.fillStyle = GOL.colors.schemes[GOL.colors.current].dead;
-          }
-        }
 
         this.context.fillRect(this.cellSpace + (this.cellSpace * i) + (this.cellSize * i), this.cellSpace + (this.cellSpace * j) + (this.cellSize * j), this.cellSize, this.cellSize);
 
@@ -635,7 +596,6 @@
        */
       changeCelltoDead : function(i, j) {
         if (i >= 0 && i < GOL.columns && j >=0 && j < GOL.rows) {
-          this.age[i][j] = -this.age[i][j]; // Keep trail
           this.drawCell(i, j, false);
         }
       }
