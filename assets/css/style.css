@@ -12,6 +12,11 @@ html, body {
   overflow: hidden;
 }
 
+/* Shows transparency of cells */
+/* body {
+  background-color: black;
+} */
+
 a {
   color: blue;
 }

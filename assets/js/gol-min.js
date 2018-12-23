@@ -505,10 +505,6 @@
         this.height = this.height + (this.cellSpace * GOL.rows) + (this.cellSize * GOL.rows);
         this.canvas.setAttribute('height', this.canvas.scrollHeight);
 
-        // Fill background
-        this.context.fillStyle = GOL.grid.schemes[GOL.grid.current].color;
-        this.context.fillRect(0, 0, this.width, this.height);
-
         for (i = 0 ; i < GOL.columns; i++) {
           for (j = 0 ; j < GOL.rows; j++) {
             if (GOL.listLife.isAlive(i, j)) {
@@ -543,15 +539,13 @@
        * drawCell
        */
       drawCell : function (i, j, alive) {
-
         if (alive) {
-          if (this.age[i][j] > -1)
+          if (this.age[i][j] > -1) {
             this.context.fillStyle = GOL.colors.schemes[GOL.colors.current].alive[this.age[i][j] % GOL.colors.schemes[GOL.colors.current].alive.length];
+            this.context.fillRect(this.cellSpace + (this.cellSpace * i) + (this.cellSize * i), this.cellSpace + (this.cellSpace * j) + (this.cellSize * j), this.cellSize, this.cellSize);
+          }
         } else
-            this.context.fillStyle = GOL.colors.schemes[GOL.colors.current].dead;
-
-        this.context.fillRect(this.cellSpace + (this.cellSpace * i) + (this.cellSize * i), this.cellSpace + (this.cellSpace * j) + (this.cellSize * j), this.cellSize, this.cellSize);
-
+            this.context.clearRect(this.cellSpace + (this.cellSpace * i) + (this.cellSize * i), this.cellSpace + (this.cellSpace * j) + (this.cellSize * j), this.cellSize, this.cellSize);
       },
 
 
