@@ -326,42 +326,18 @@
      */
     handlers : {
 
-      mouseDown : false,
       lastX : 0,
       lastY : 0,
-
-
-      /**
-       *
-       */
-      canvasMouseDown : function(event) {
-        var position = GOL.helpers.mousePosition(event);
-        GOL.canvas.switchCell(position[0], position[1]);
-        GOL.handlers.lastX = position[0];
-        GOL.handlers.lastY = position[1];
-        GOL.handlers.mouseDown = true;
-      },
-
-
-      /**
-       *
-       */
-      canvasMouseUp : function() {
-        GOL.handlers.mouseDown = false;
-      },
-
 
       /**
        *
        */
       canvasMouseMove : function(event) {
-        if (GOL.handlers.mouseDown) {
-          var position = GOL.helpers.mousePosition(event);
-          if ((position[0] !== GOL.handlers.lastX) || (position[1] !== GOL.handlers.lastY)) {
-            GOL.canvas.switchCell(position[0], position[1]);
-            GOL.handlers.lastX = position[0];
-            GOL.handlers.lastY = position[1];
-          }
+        var position = GOL.helpers.mousePosition(event);
+        if ((position[0] !== GOL.handlers.lastX) || (position[1] !== GOL.handlers.lastY)) {
+          GOL.canvas.switchCell(position[0], position[1]);
+          GOL.handlers.lastX = position[0];
+          GOL.handlers.lastY = position[1];
         }
       },
 
@@ -458,9 +434,7 @@
         this.cellSize = GOL.zoom.schemes[GOL.zoom.current].cellSize;
         this.cellSpace = 1;
 
-        GOL.helpers.registerEvent(this.canvas, 'mousedown', GOL.handlers.canvasMouseDown, false);
-        GOL.helpers.registerEvent(document, 'mouseup', GOL.handlers.canvasMouseUp, false);
-        GOL.helpers.registerEvent(this.canvas, 'mousemove', GOL.handlers.canvasMouseMove, false);
+        GOL.helpers.registerEvent(document, 'mousemove', GOL.handlers.canvasMouseMove, false);
 
         this.clearWorld();
       },

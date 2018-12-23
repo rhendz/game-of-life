@@ -57,7 +57,18 @@ abbr {
 }
 
 /* ################################### */
+/* Demonstrates interactivity with canvas behind div */
+div {
+  z-index: 1;
+  position: absolute;
+  width: 30vw;
+  height: 100vw;
+  background-color: black;
+  opacity: 0.5;
+}
+
 canvas {
+  z-index: -1;
   border: 0;
   padding: 0;
   margin: 0;
